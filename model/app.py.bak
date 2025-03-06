@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, jsonify, url_for, send_from_directory
+from flask import Flask, request, render_template, jsonify, url_for
 import joblib
 import numpy as np
 from sklearn.preprocessing import StandardScaler
@@ -112,10 +112,6 @@ def predict():
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
-
-@app.route('/static/<path:filename>')
-def static_files(filename):
-    return send_from_directory(app.static_folder, filename)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

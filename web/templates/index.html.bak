@@ -25,11 +25,11 @@
                     <p>0</p>
                 </div>
                 <div class="image-container">
-                    <img src="{{ url_for('static', filename='images/1.JPG') }}" alt="1">
+                    <img src="{{ url_for('static', filename='images/1.jpg') }}" alt="1">
                     <p>1</p>
                 </div>
                 <div class="image-container">
-                    <img src="{{ url_for('static', filename='images/2.JPG') }}" alt="2">
+                    <img src="{{ url_for('static', filename='images/2.jpg') }}" alt="2">
                     <p>2</p>
                 </div>
                 <div class="image-container">

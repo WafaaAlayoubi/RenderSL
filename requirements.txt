@@ -1,2 +1,3 @@
 mediapipe
 flask
+joblib

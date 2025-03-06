@@ -1,6 +1,5 @@
 mediapipe
 flask
 joblib
-sklearn
 opencv-python
 scikit-learn

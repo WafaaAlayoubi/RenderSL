@@ -8,14 +8,18 @@ import cv2
 import mediapipe as mp
 from datetime import datetime
 
-app = Flask(__name__,template_folder='../web/templates', static_folder='../web/static')
+app = Flask(__name__, template_folder='../web/templates', static_folder='../web/static')
 
+# Configure the upload folder
+app.config['UPLOAD_FOLDER'] = os.path.join('..', 'web', 'uploads')
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
 
 # Load the model and scaler
 loaded_model = joblib.load('random_forest_model.pkl')
 loaded_scaler = joblib.load('scaler.pkl')
 
-def preprocessing(image):
+def preprocessing(image_name):
     mp_hands = mp.solutions.hands
 
     with mp_hands.Hands(
@@ -23,9 +27,10 @@ def preprocessing(image):
         max_num_hands=2,
         min_detection_confidence=0.5) as hands:
         
-        image = cv2.flip(image, 1)
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_name)
+        image = cv2.flip(cv2.imread(image_path), 1)
         if image is None:
-            print("Error: Unable to read image")
+            print(f"Error: Unable to read image at {image_path}")
             return None
         # Convert the BGR image to RGB before processing.
         results = hands.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
@@ -83,12 +88,16 @@ def predict():
             return jsonify({'error': 'No file provided'}), 400
         return render_template('index.html', error='No file provided')
 
-    # Read the image file directly
-    image = Image.open(file.stream)
-    image = np.array(image)
+    # Get the image name and add a timestamp
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    image_name = f"{timestamp}_{file.filename}"
+
+    # Save the file to the upload folder
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], image_name)
+    file.save(file_path)
 
     # Preprocess the image data using the loaded scaler
-    X_new_scaled = preprocessing(image)
+    X_new_scaled = preprocessing(image_name)
     if X_new_scaled is None:
         if request.accept_mimetypes.accept_json:
             return jsonify({'error': 'No hand landmarks detected'}), 400
@@ -105,4 +114,5 @@ def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)

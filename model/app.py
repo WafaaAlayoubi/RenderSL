@@ -8,7 +8,7 @@ import cv2
 import mediapipe as mp
 from datetime import datetime
 
-app = Flask(__name__,template_folder='../web/templates')
+app = Flask(__name__,template_folder='../web/templates', static_folder='../web/static')
 
 
 # Load the model and scaler
